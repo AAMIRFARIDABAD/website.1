@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HelpHub — Business Ideas & AI Support</title>
+  <meta name="description" content="A professional single‑page website with curated business ideas, risk notes, profit calculator, and a built‑in AI‑style chat support (front‑end only)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#0e1630; --ink:#f6f8ff; --muted:#b8c2ea;
+      --brand:#7c5cff; --accent:#31d0aa; --warn:#ffb020; --danger:#ff6b6b;
+      --ring: rgba(124,92,255,.35);
+    }
+    *{box-sizing:border-box} html,body{margin:0}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:radial-gradient(900px 600px at 10% -10%, #1b2a6b 0%, rgba(0,0,0,0) 60%), radial-gradient(800px 500px at 100% 0%, #263a8b 0%, rgba(0,0,0,0) 55%), var(--bg); color:var(--ink)}
+    a{color:inherit; text-decoration:none}
+    .topline{height:4px; background:linear-gradient(90deg,#7c5cff,#31d0aa,#ffd166,#7c5cff); background-size:300% 100%; animation:move 8s linear infinite}
+    @keyframes move{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    header{position:sticky; top:0; z-index:40; backdrop-filter:blur(10px) saturate(140%); background:rgba(10,15,35,.65); border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav{width:min(1200px,92%); margin:auto; display:flex; align-items:center; justify-content:space-between; padding:12px 0; gap:10px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .logo{width:36px; height:36px; border-radius:12px; background:conic-gradient(from 0deg, #7c5cff, #31d0aa, #ffd166, #7c5cff); box-shadow:0 10px 28px rgba(124,92,255,.35)}
+    h1{font-size:1.2rem; margin:0}
+
+    .btn{--c:var(--brand); background:linear-gradient(180deg, color-mix(in oklab, var(--c) 90%, #000 10%), color-mix(in oklab, var(--c) 70%, #000 30%)); color:#0d081a; font-weight:800; border:1px solid color-mix(in oklab, var(--c) 70%, #000 30%); padding:11px 16px; border-radius:12px; cursor:pointer; box-shadow:0 14px 28px -14px color-mix(in oklab, var(--c) 50%, #000 50%), inset 0 -3px 0 color-mix(in oklab, var(--c) 60%, #000 40%); transition:transform .12s ease, filter .2s ease}
+    .btn:hover{transform:translateY(-1px); filter:saturate(115%)} .btn:active{transform:translateY(0)}
+    .btn-outline{background:transparent; color:var(--ink); border:1px solid rgba(255,255,255,.15); box-shadow:inset 0 -3px 0 rgba(255,255,255,.06)}
+    .btn-mint{--c:var(--accent); color:#031a16}
+    .btn-warn{--c:var(--warn); color:#2a1a01}
+
+    .container{width:min(1200px,92%); margin:auto}
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:20px; padding:34px 0}
+    .hero h2{font-family:"Playfair Display",serif; font-size:clamp(1.6rem,3vw+1rem,3.1rem); margin:.2rem 0 .6rem}
+    .subtitle{color:var(--muted)}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:0 24px 60px -40px #000}
+    .p16{padding:16px} .p20{padding:20px}
+
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px}
+    .card{border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); transition:transform .15s ease}
+    .card:hover{transform:translateY(-3px)}
+    .card h3{margin:0 0 6px 0}
+    .muted{color:var(--muted)}
+    .tag{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); font-weight:700}
+    .row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+
+    /* Calculator */
+    .calc input{width:100%; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0c1330; color:var(--ink); outline:none}
+    .calc input:focus{border-color:var(--ring); box-shadow:0 0 0 6px rgba(124,92,255,.18)}
+    .result{padding:10px 12px; border-radius:12px; background:#0c1434; border:1px solid rgba(255,255,255,.08)}
+
+    /* Chatbot */
+    .chat-launch{position:fixed; right:18px; bottom:18px; z-index:60}
+    .chat{position:fixed; right:18px; bottom:78px; width:min(360px, 92vw); display:none; flex-direction:column; gap:10px; background:linear-gradient(180deg,#0e1635,#0b1128); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:12px; box-shadow:0 30px 80px -20px rgba(0,0,0,.6); z-index:60}
+    .chat.open{display:flex}
+    .chat-log{height:320px; overflow:auto; display:flex; flex-direction:column; gap:8px; padding:4px}
+    .bubble{max-width:80%; padding:10px 12px; border-radius:14px; line-height:1.35}
+    .bot{background:#121d45; border:1px solid rgba(255,255,255,.08)}
+    .me{background:#1e284f; border:1px solid rgba(124,92,255,.25); align-self:flex-end}
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
+    .chip{padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.06); cursor:pointer}
+    .chat-input{display:flex; gap:8px}
+    .chat-input input{flex:1; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0c1330; color:var(--ink)}
+
+    footer{border-top:1px solid rgba(255,255,255,.08); color:var(--muted); padding:26px 0 38px; margin-top:26px}
+
+    @media(max-width:900px){ .hero{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <div class="topline" aria-hidden="true"></div>
+  <header>
+    <div class="nav container">
+      <div class="brand"><div class="logo"></div><h1>HelpHub</h1></div>
+      <div class="row">
+        <a href="#ideas" class="btn btn-outline">Business Ideas</a>
+        <a href="#calc" class="btn">Profit Calculator</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h2>Start smarter. Help more people. Minimise risk.</h2>
+        <p class="subtitle">Curated small‑business ideas with startup cost, skills, risk level & tips. Plus a built‑in AI‑style chat to answer your questions — no server required.</p>
+        <div class="row" style="margin-top:10px">
+          <a href="#ideas" class="btn">Explore Ideas</a>
+          <a href="#calc" class="btn btn-mint">Try Calculator</a>
+          <button class="btn btn-warn" onclick="toggleChat(true)">Ask in Chat</button>
+        </div>
+      </div>
+      <div class="panel p16">
+        <div class="row" style="justify-content:space-between; margin-bottom:8px">
+          <strong>Quick Filters</strong>
+          <div class="row">
+            <span class="tag">Low Cost</span>
+            <span class="tag">Work from Home</span>
+            <span class="tag">Food</span>
+            <span class="tag">Services</span>
+          </div>
+        </div>
+        <div class="grid" id="quickIdeas"></div>
+      </div>
+    </section>
+
+    <section id="ideas">
+      <h2 style="margin:8px 0 12px">Top Business Ideas (with Risk & Tips)</h2>
+      <div class="grid" id="ideaGrid"></div>
+    </section>
+
+    <section id="calc">
+      <h2 style="margin:8px 0 12px">Simple Profit / Loss Calculator</h2>
+      <div class="panel p20 calc">
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+          <div>
+            <label>Monthly Fixed Costs (rent, salary) — ₹</label>
+            <input id="fixed" type="number" min="0" value="20000" />
+          </div>
+          <div>
+            <label>Variable Cost per Unit — ₹</label>
+            <input id="var" type="number" min="0" value="50" />
+          </div>
+          <div>
+            <label>Selling Price per Unit — ₹</label>
+            <input id="price" type="number" min="1" value="120" />
+          </div>
+          <div>
+            <label>Expected Units per Month</label>
+            <input id="units" type="number" min="0" value="500" />
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="compute()">Compute</button>
+          <button class="btn btn-outline" onclick="fillExample('tiffin')">Example: Tiffin Service</button>
+          <button class="btn btn-outline" onclick="fillExample('phone')">Example: Phone Repair</button>
+        </div>
+        <div id="result" class="result" style="margin-top:12px">Fill inputs and click Compute.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap">
+      <div>© <span id="year"></span> HelpHub — Built for guidance & learning (no legal/financial liability).</div>
+      <div>📍 Your City • 📞 +91-90000-00000 • ✉️ you@example.com</div>
+    </div>
+  </footer>
+
+  <!-- Chat Widget -->
+  <div class="chat-launch"><button class="btn" onclick="toggleChat()">💬 Chat</button></div>
+  <div id="chat" class="chat" role="dialog" aria-label="AI Support Chat">
+    <div class="row" style="justify-content:space-between; align-items:center">
+      <strong>AI Support</strong>
+      <button class="btn btn-outline" onclick="toggleChat(false)">✕</button>
+    </div>
+    <div id="chatLog" class="chat-log panel p16" aria-live="polite"></div>
+    <div class="chips" id="chatChips"></div>
+    <div class="chat-input">
+      <input id="chatInput" placeholder="Ask about ideas, risk, marketing, pricing..." onkeydown="if(event.key==='Enter') send()" />
+      <button class="btn" onclick="send()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    // ======= Data: Ideas =======
+    const ideas = [
+      {name:'Tiffin Service', cat:'Food', cost:'Low', risk:'Low', skill:'Cooking, Hygiene, Delivery', tips:['Start local (offices/hostels)','Monthly plans reduce churn','Use WhatsApp menu'], loss:"Perishables waste if demand misjudged; manage portions.", up:"Recurring income & referrals."},
+      {name:'Cloud Kitchen (Snacks/Pizza)', cat:'Food', cost:'Medium', risk:'Medium', skill:'Menu, Packaging, Swiggy/Zomato ops', tips:['Focus 6-8 items','High quality photos','Bundle combos'], loss:'High aggregator commissions; control food cost.', up:'Scales fast with online orders.'},
+      {name:'Mobile Phone Repair', cat:'Services', cost:'Low-Med', risk:'Low', skill:'Hardware basics, Soldering, Inventory', tips:['Free diagnosis','Use reels for before/after','Sell accessories'], loss:'Damaged device liability—use consent forms.', up:'High margin on spares/services.'},
+      {name:'Tutoring / Online Classes', cat:'Education', cost:'Low', risk:'Low', skill:'Subject expertise, Communication', tips:['Small groups 5–8','Results testimonials','Exam calendar offers'], loss:'Seasonal demand; plan vacation camps.', up:'Stable income with batches.'},
+      {name:'Digital Marketing Agency', cat:'Online', cost:'Low', risk:'Medium', skill:'SEO, Ads, Design', tips:['Niche focus (salons, gyms)','Case studies','Result-based pricing'], loss:'Client churn; keep contracts.', up:'Retainers & scalable team.'},
+      {name:'Custom T‑Shirt (Print‑on‑Demand)', cat:'Online', cost:'Low', risk:'Med', skill:'Design, Niche research', tips:['No stock—use POD','Micro-niches','Use influencers'], loss:'Low conversion; test ads small.', up:'No inventory risk.'},
+      {name:'Home Cleaning Services', cat:'Services', cost:'Med', risk:'Low', skill:'Ops, Team mgmt', tips:['Package pricing','Before/after photos','Festive offers'], loss:'Labour scheduling issues; buffer time.', up:'Strong word‑of‑mouth.'},
+      {name:'Event Photography', cat:'Creative', cost:'Med', risk:'Med', skill:'Camera, Editing', tips:['Portfolio site','Tiered packages','Upsell reels'], loss:'Gear damage; insure & backup.', up:'Premium margins on weddings.'},
+      {name:'EV Charging Kiosk (Tie‑up)', cat:'Infra', cost:'High', risk:'Med', skill:'Permits, Location', tips:['Partner with malls','Dynamic pricing','Loyalty app'], loss:'Capex heavy; utilise >20% daily.', up:'Future‑ready demand.'},
+      {name:'Pet Grooming (Home Visit)', cat:'Services', cost:'Med', risk:'Med', skill:'Grooming, Pet handling', tips:['Area‑wise slots','Referral program','Pet photos'], loss:'Bites/injury risk; insurance.', up:'Repeat clients every 4–8 weeks.'},
+      {name:'Dropshipping Store', cat:'Online', cost:'Low', risk:'High', skill:'Ads, Product research, Support', tips:['Test quickly','Cashflow tracking','Quality supplier'], loss:'Refunds & long shipping times.', up:'No inventory; global reach.'},
+      {name:'YouTube EdTech Channel', cat:'Content', cost:'Low', risk:'Med', skill:'Teaching, Scripting', tips:['Consistent schedule','CTAs to course','SEO titles'], loss:'Slow start; keep 6‑month runway.', up:'Compounding audience.'},
+    ];
+
+    // quick picks (low cost & food)
+    const quick = ideas.filter(i=> i.cost.includes('Low') || i.cat==='Food').slice(0,6);
+
+    function ideaCard(i){
+      return `<article class="card p16">
+        <div class="row" style="justify-content:space-between"><h3>${i.name}</h3><span class="tag">${i.cat}</span></div>
+        <p class="muted">Startup Cost: <strong>${i.cost}</strong> • Risk: <strong>${i.risk}</strong></p>
+        <p class="muted">Key skills: ${i.skill}</p>
+        <div class="row" style="margin:.3rem 0">${i.tips.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn btn-mint" onclick='learn("${i.name}")'>What to do</button>
+          <button class="btn btn-outline" onclick='risk("${i.name}")'>Risks</button>
+        </div>
+      </article>`;
+    }
+
+    function renderIdeas(){
+      document.getElementById('quickIdeas').innerHTML = quick.map(ideaCard).join('');
+      document.getElementById('ideaGrid').innerHTML = ideas.map(ideaCard).join('');
+    }
+
+    function learn(name){
+      const i = ideas.find(x=>x.name===name);
+      pushBot(`How to start <b>${i.name}</b>?<br>1) Validate demand (10 target customers).<br>2) Start small MVP in 2 weeks.<br>3) Track CAC, AOV, retention.<br><b>First steps:</b> ${i.tips.slice(0,3).join('; ')}.`);
+      toggleChat(true);
+    }
+
+    function risk(name){ const i = ideas.find(x=>x.name===name); pushBot(`<b>${i.name}</b> — Possible Loss / Risk:<br>• ${i.loss}<br><b>Upside:</b> ${i.up}`); toggleChat(true); }
+
+    // ======= Calculator =======
+    function compute(){
+      const F = +document.getElementById('fixed').value||0;
+      const V = +document.getElementById('var').value||0;
+      const P = +document.getElementById('price').value||0;
+      const U = +document.getElementById('units').value||0;
+      if(P<=V){
+        document.getElementById('result').innerHTML = `⚠️ Selling price (₹${P}) must be greater than variable cost (₹${V}). Otherwise every sale makes a loss.`;
+        return;
+      }
+      const margin = P - V; // per unit contribution
+      const breakevenUnits = Math.ceil(F / margin);
+      const profit = margin * U - F;
+      const status = profit>=0? '✅ Projected Profit':'❌ Projected Loss';
+      document.getElementById('result').innerHTML = `Contribution per unit: <b>₹${margin.toFixed(2)}</b><br>Break‑even: <b>${breakevenUnits} units/month</b><br>${status}: <b>₹${profit.toLocaleString('en-IN')}</b> at ${U} units.`;
+    }
+
+    function fillExample(type){
+      if(type==='tiffin'){
+        fixed.value=20000; var_.value=60; price.value=120; units.value=600; compute();
+      } else if(type==='phone'){
+        fixed.value=15000; var_.value=120; price.value=600; units.value=120; compute();
+      }
+    }
+
+    // alias for var input element (since var is reserved)
+    const var_ = document.getElementById('var');
+
+    // ======= Chatbot (front‑end intent engine) =======
+    const chat = document.getElementById('chat');
+    const log = document.getElementById('chatLog');
+    const input = document.getElementById('chatInput');
+
+    const intents = [
+      {k:['hello','hi','namaste','hey'], r:'Namaste! Main aapki madad ke liye hoon. Business idea, risk, marketing, pricing — jo bhi puchna ho puchiye.'},
+      {k:['risk','loss','nuksan'], r:'Risk ko kam karne ke liye: (1) chhota shuru karein, (2) cost track karein (fixed/variable), (3) demand validate karein, (4) pre‑orders/advance lein.'},
+      {k:['tiffin','dabba','lunch'], r:'Tiffin Service: Low cost, recurring income. WhatsApp menu, monthly pack, hygiene certificate. Loss tab hota hai jab wastage zyada ho — portions plan karein.'},
+      {k:['phone','mobile repair'], r:'Phone Repair: Profit achcha, par liability high. Job card/consent form sign karayein, parts quality maintain karein, diagnostics free rakhein.'},
+      {k:['marketing','customer','ad'], r:'Low‑budget marketing: Google My Business, Instagram Reels, local WhatsApp groups, referral discount, micro‑influencers.'},
+      {k:['pricing','price','cost'], r:'Pricing ke liye: cost + margin, competitor check, value‑based addons. Calculator section me numbers daaliye, main profit bataa dunga.'},
+      {k:['legal','license','gst'], r:'Basic compliance: GST (if turnover threshold cross), invoice, FSSAI (food), shop act license. Local CA se confirm karna zaroori hai.'}
+    ];
+
+    const chips = [
+      'Best low‑cost idea?','Food business risk?','Marketing kaise kare?','Pricing help','Tiffin start steps','Phone repair tips','Dropshipping safe hai?'
+    ];
+
+    function toggleChat(force){
+      chat.classList.toggle('open', force===true? true : force===false? false : !chat.classList.contains('open'));
+      if(chat.classList.contains('open')){ input.focus(); if(log.childElementCount===0) greet(); renderChips(); }
+    }
+
+    function greet(){
+      pushBot('👋 Welcome to HelpHub Chat! Quick questions ke liye neeche chips par tap karein ya apna sawal type karein.');
+    }
+
+    function renderChips(){
+      document.getElementById('chatChips').innerHTML = chips.map(c=>`<span class='chip' onclick='quickAsk("${c}")'>${c}</span>`).join('');
+    }
+
+    function quickAsk(text){ input.value = text; send(); }
+
+    function pushMe(t){ const b=document.createElement('div'); b.className='bubble me'; b.innerHTML=t; log.appendChild(b); log.scrollTop=log.scrollHeight; }
+    function pushBot(t){ const b=document.createElement('div'); b.className='bubble bot'; b.innerHTML=t; log.appendChild(b); log.scrollTop=log.scrollHeight; }
+
+    function matchIntent(text){
+      const t = text.toLowerCase();
+      // special cases
+      if(t.includes('dropshipping')) return 'Dropshipping: Inventory nahi hota, par shipping slow aur quality issues se refunds badh sakte hain. Chhote budget se test karein; COD India me risky ho sakta hai.';
+      for(const it of intents){ if(it.k.some(k=> t.includes(k))) return it.r; }
+      // idea recommendation
+      if(/(low|kam)\s*(budget|cost)/.test(t)) return 'Low‑cost: Tiffin Service, Tutoring, Digital Marketing Freelancer, Phone Repair (basic tools). Pehle local demand validate karein.';
+      if(/food|restaurant|kitchen/.test(t)) return 'Food business: small menu, hygiene, photos, delivery tie‑ups, and portion control. Calculator se price set karein.';
+      return null;
+    }
+
+    function send(){
+      const text = input.value.trim(); if(!text) return; input.value=''; pushMe(text);
+      const m = matchIntent(text);
+      if(m){ pushBot(m); return; }
+      // fallback: keyword to idea
+      const any = ideas.find(i=> text.toLowerCase().includes(i.name.toLowerCase().split(' ')[0]));
+      if(any){ pushBot(`For <b>${any.name}</b>: Start with 10 trial customers, SOPs banayein, and track cost. Risk: ${any.risk}. Tip: ${any.tips[0]}.`); return; }
+      pushBot("Sorry, is sawal ka direct jawaab mere paas nahi. Aap 'marketing', 'pricing', ya 'risk' jaisa keyword try karein.");
+    }
+
+    // ===== Init =====
+    (function(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+      renderIdeas();
+      // Accessibility: close chat with ESC
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') toggleChat(false); });
+    })();
+  </script>
+</body>
+</html>
